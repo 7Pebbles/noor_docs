@@ -8,6 +8,7 @@ function HomepageHeader() {
   return (
     <header className="hero hero--primary" style={{textAlign: 'center', padding: '6rem 0'}}>
       <div className="container">
+        <img src="/img/logo.png" alt="Noor" style={{width: 120, height: 120, marginBottom: '1rem'}} />
         <Heading as="h1" className="hero__title">
           {siteConfig.title}
         </Heading>

@@ -5,7 +5,7 @@ import type * as Preset from '@docusaurus/preset-classic';
 const config: Config = {
   title: 'Noor',
   tagline: 'Single-file PHP framework for shared hosting',
-  favicon: 'img/favicon.ico',
+  favicon: 'img/logo.png',
 
   url: 'https://noor-framework.vercel.app',
   baseUrl: '/',
@@ -56,7 +56,7 @@ const config: Config = {
       title: 'Noor',
       logo: {
         alt: 'Noor Logo',
-        src: 'img/logo.svg',
+        src: 'img/logo.png',
       },
       items: [
         {
