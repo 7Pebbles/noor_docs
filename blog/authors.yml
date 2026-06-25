@@ -1,8 +1,8 @@
 qu:
   name: Noor Team
   title: Framework Maintainer
-  url: https://github.com/qutaha
-  image_url: https://github.com/qutaha.png
+  url: https://git.qutaha.in/qu
+  image_url: https://git.qutaha.in/qu/avatar.png
   page: true
   socials:
     github: qutaha

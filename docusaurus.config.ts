@@ -27,7 +27,7 @@ const config: Config = {
       {
         docs: {
           sidebarPath: './sidebars.ts',
-          editUrl: 'https://github.com/qutaha/noor/tree/main/docs/',
+          editUrl: 'https://git.qutaha.in/qu/noor/tree/main/docs/',
         },
         blog: {
           showReadingTime: true,
@@ -35,7 +35,7 @@ const config: Config = {
             type: ['rss', 'atom'],
             xslt: true,
           },
-          editUrl: 'https://github.com/qutaha/noor/tree/main/docs/',
+          editUrl: 'https://git.qutaha.in/qu/noor/tree/main/docs/',
           onInlineTags: 'warn',
           onInlineAuthors: 'warn',
           onUntruncatedBlogPosts: 'warn',

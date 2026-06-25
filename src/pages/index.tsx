@@ -29,7 +29,7 @@ function HomepageHeader() {
           </a>
           <a
             className="button button--secondary button--lg"
-            href="https://github.com/qutaha/noor">
+            href="https://git.qutaha.in/qu/noor">
             GitHub
           </a>
         </div>
