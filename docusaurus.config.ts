@@ -67,8 +67,8 @@ const config: Config = {
         },
         {to: '/blog', label: 'Blog', position: 'left'},
         {
-          href: 'https://github.com/qutaha/noor',
-          label: 'GitHub',
+          href: 'https://git.qutaha.in/qu/noor',
+          label: 'Source',
           position: 'right',
         },
       ],
@@ -87,15 +87,15 @@ const config: Config = {
         {
           title: 'Community',
           items: [
-            {label: 'GitHub Issues', href: 'https://github.com/qutaha/noor/issues'},
-            {label: 'GitHub Discussions', href: 'https://github.com/qutaha/noor/discussions'},
+          {label: 'Issues', href: 'https://git.qutaha.in/qu/noor/issues'},
+          {label: 'Pull Requests', href: 'https://git.qutaha.in/qu/noor/pulls'},
           ],
         },
         {
           title: 'More',
           items: [
             {label: 'Blog', to: '/blog'},
-            {label: 'GitHub', href: 'https://github.com/qutaha/noor'},
+            {label: 'Source', href: 'https://git.qutaha.in/qu/noor'},
           ],
         },
       ],
