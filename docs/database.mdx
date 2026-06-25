@@ -1,0 +1,163 @@
+# Database
+
+Noor includes a thin PDO wrapper with a fluent query builder. MySQL, SQLite, and PostgreSQL are supported.
+
+## Configuration
+
+```php
+DB::addConnection([
+    'driver'   => 'mysql',
+    'host'     => '127.0.0.1',
+    'port'     => '3306',
+    'database' => 'mydb',
+    'username' => 'root',
+    'password' => '',
+    'charset'  => 'utf8mb4',
+]);
+```
+
+Or load from config:
+
+```php
+DB::addConnection(config('database.connections.mysql'));
+```
+
+### SQLite
+
+```php
+DB::addConnection([
+    'driver'   => 'sqlite',
+    'database' => __DIR__ . '/database.sqlite',
+]);
+```
+
+### PostgreSQL
+
+```php
+DB::addConnection([
+    'driver'   => 'pgsql',
+    'host'     => '127.0.0.1',
+    'database' => 'mydb',
+    'username' => 'postgres',
+    'password' => '',
+]);
+```
+
+### Multiple Connections
+
+```php
+DB::addConnection($mysqlConfig, 'mysql');
+DB::addConnection($pgsqlConfig, 'pgsql');
+
+DB::table('users', 'mysql')->get();
+DB::table('users', 'pgsql')->get();
+```
+
+## Query Builder
+
+### Select
+
+```php
+$users = DB::table('users')->get();
+$user  = DB::table('users')->where('id', 1)->first();
+$user  = DB::table('users')->find(1);
+$email = DB::table('users')->where('id', 1)->value('email');
+$names = DB::table('users')->pluck('name', 'id');
+```
+
+### Where Clauses
+
+```php
+DB::table('users')->where('name', 'John')->get();
+DB::table('users')->where('name', 'like', '%John%')->get();
+DB::table('users')->where('active', true)->orWhere('admin', true)->get();
+DB::table('users')->whereIn('id', [1, 2, 3])->get();
+DB::table('users')->whereNotIn('id', [4, 5])->get();
+DB::table('users')->whereNull('deleted_at')->get();
+DB::table('users')->whereNotNull('email_verified_at')->get();
+DB::table('users')->whereBetween('age', [18, 35])->get();
+```
+
+### Joins
+
+```php
+DB::table('users')
+    ->join('orders', 'users.id', '=', 'orders.user_id')
+    ->select('users.*', 'orders.total')
+    ->get();
+
+DB::table('users')
+    ->leftJoin('profiles', 'users.id', '=', 'profiles.user_id')
+    ->get();
+```
+
+### Ordering & Limit
+
+```php
+DB::table('users')
+    ->orderBy('name', 'asc')
+    ->orderBy('created_at', 'desc')
+    ->limit(10)
+    ->offset(20)
+    ->get();
+```
+
+### Aggregates
+
+```php
+DB::table('users')->count();
+DB::table('users')->where('active', true)->exists();
+DB::table('users')->where('active', false)->doesntExist();
+```
+
+### Insert
+
+```php
+DB::table('users')->insert([
+    'name' => 'John',
+    'email' => 'john@example.com',
+]);
+
+$id = DB::table('users')->insertGetId([
+    'name' => 'Jane',
+]);
+```
+
+### Update
+
+```php
+DB::table('users')
+    ->where('id', 1)
+    ->update(['name' => 'Updated Name']);
+```
+
+### Delete
+
+```php
+DB::table('users')->where('id', 1)->delete();
+DB::table('users')->truncate();
+```
+
+## Raw Queries
+
+```php
+$users = DB::select('SELECT * FROM users WHERE id = ?', [1]);
+DB::insert('INSERT INTO users (name) VALUES (?)', ['John']);
+DB::update('UPDATE users SET name = ? WHERE id = ?', ['Jane', 1]);
+DB::delete('DELETE FROM users WHERE id = ?', [1]);
+DB::statement('CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT)');
+```
+
+## Transactions
+
+```php
+DB::beginTransaction();
+try {
+    DB::table('accounts')->where('id', 1)->update(['balance' => 100]);
+    DB::table('accounts')->where('id', 2)->update(['balance' => 200]);
+    DB::commit();
+} catch (\Exception $e) {
+    DB::rollBack();
+    throw $e;
+}
+```

@@ -1,0 +1,65 @@
+# Error Handling
+
+## Custom Error Handlers
+
+Register handlers for specific HTTP status codes:
+
+```php
+App::error(404, function ($e) {
+    return response()->view('errors.404')->status(404);
+});
+
+App::error(403, function ($e) {
+    return response()->view('errors.403')->status(403);
+});
+
+App::error(500, function ($e) {
+    error_log($e->getMessage());
+    return response()->view('errors.500')->status(500);
+});
+```
+
+### Catch-All Handler
+
+```php
+App::error(0, function ($e) {
+    $code = $e->getCode() ?: 500;
+    return response()->view('errors.generic', ['code' => $code])->status($code);
+});
+```
+
+## Debug Mode
+
+Set `APP_DEBUG=true` in your `.env` file:
+
+```
+APP_DEBUG=true
+```
+
+With debug enabled, errors show a detailed diagnostic page with:
+- HTTP status code and message
+- Full stack trace with file paths and line numbers
+- Request method and URI
+- Client IP address
+
+With `APP_DEBUG=false` (production), users see clean, minimal error pages.
+
+## HTTP Exceptions
+
+Throw exceptions to trigger error handling:
+
+```php
+abort(404);                         // Throws NotFoundException
+abort(403, 'Forbidden');            // Throws HttpException
+throw new HttpException('Custom error', 400);
+```
+
+## Validation Exceptions
+
+The framework automatically handles `ValidationException` by redirecting back with errors and old input.
+
+```php
+// Inside a route handler
+throw new ValidationException(['email' => ['Required']], $request->all());
+// Automatically redirects back with errors and old input
+```

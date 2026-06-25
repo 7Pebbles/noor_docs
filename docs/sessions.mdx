@@ -1,0 +1,66 @@
+# Sessions
+
+Sessions use PHP's native session handling with a clean API.
+
+## Basic Usage
+
+```php
+// Store
+Session::put('key', 'value');
+
+// Retrieve
+$value = Session::get('key', 'default');
+
+// Check
+if (Session::has('key')) { ... }
+
+// Remove
+Session::forget('key');
+
+// Get & remove
+$value = Session::pull('key');
+
+// All data
+$data = Session::all();
+```
+
+## Flash Data
+
+Data stored for only the next request:
+
+```php
+Session::flash('success', 'Operation completed!');
+Session::flash('warning', 'Please verify your email.');
+```
+
+## CSRF Protection
+
+Built-in CSRF token generation and validation:
+
+```php
+// Get token
+$token = Session::token();
+
+// Verify
+if (Session::verifyToken($token)) { ... }
+
+// In forms
+echo csrf_field();
+// or with the @csrf directive:
+// @csrf
+
+// Send via AJAX
+fetch('/api/data', {
+    headers: { 'X-CSRF-TOKEN': csrfToken }
+});
+```
+
+The `CsrfMiddleware` automatically validates tokens on POST, PUT, PATCH, and DELETE requests (except excluded routes).
+
+## Helper
+
+```php
+session('key');          // Same as Session::get('key')
+session('key', 'default');
+session();               // Same as Session::all()
+```

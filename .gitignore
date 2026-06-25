@@ -1,0 +1,6 @@
+node_modules/
+.docusaurus/
+build/
+*.tsbuildinfo
+.vscode/
+.DS_Store

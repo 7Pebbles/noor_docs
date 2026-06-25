@@ -1,0 +1,115 @@
+# Request & Response
+
+## Request
+
+The `Request` object wraps `$_GET`, `$_POST`, `$_SERVER`, `$_FILES`, and JSON request bodies.
+
+```php
+Route::post('/form', function ($request) {
+    // Input
+    $request->input('email');
+    $request->input('email', 'default');
+    $request->all();
+    $request->only(['name', 'email']);
+    $request->except(['password']);
+
+    // Check
+    $request->has('email');
+    $request->missing('email');
+    $request->filled('email');
+
+    // Dynamic property access
+    $request->email;  // same as $request->input('email')
+});
+```
+
+### Request Information
+
+```php
+$request->method();          // GET, POST, PUT, DELETE
+$request->path();            // /path/without/query
+$request->url();             // Full URL without query
+$request->fullUrl();         // Full URL with query string
+$request->ip();              // Client IP (respects proxies)
+$request->isSecure();        // Check HTTPS
+$request->isAjax();          // Check X-Requested-With header
+$request->bearerToken();     // Bearer token from Authorization header
+$request->header('Content-Type');
+```
+
+### JSON Bodies
+
+JSON request bodies (`Content-Type: application/json`) are automatically parsed:
+
+```php
+// POST /api/users with {"name": "John", "email": "john@example.com"}
+Route::post('/api/users', function ($request) {
+    $name  = $request->input('name');   // "John"
+    $email = $request->input('email');  // "john@example.com"
+    $all   = $request->all();           // ["name" => "John", "email" => "john@example.com"]
+});
+```
+
+### File Uploads
+
+```php
+Route::post('/upload', function ($request) {
+    if ($request->hasFile('avatar')) {
+        $file = $request->file('avatar');
+
+        $file->getClientOriginalName();
+        $file->getClientMimeType();
+        $file->getSize();
+        $file->extension();
+        $file->isValid();
+
+        $path = $file->store('uploads/');
+        $path = $file->storeAs('uploads/', 'custom-name.jpg');
+    }
+});
+```
+
+## Response
+
+Build HTTP responses fluently:
+
+### JSON
+
+```php
+return response()->json(['user' => $user], 201);
+return response()->json(['error' => 'Unauthorized'], 401);
+```
+
+### Views
+
+```php
+return response()->view('profile', ['user' => $user]);
+return response()->view('emails.welcome', $data)->status(200);
+```
+
+### Redirects
+
+```php
+return response()->redirect('/login');
+return redirect('/login');  // Helper
+
+return redirect('/login')->with('success', 'Logged in!');
+return redirect()->back();
+return redirect()->back()->withErrors($errors)->withInput();
+```
+
+### Downloads & Files
+
+```php
+return response()->download('/path/to/file.pdf', 'invoice.pdf');
+return response()->file('/path/to/image.jpg');
+```
+
+### Other
+
+```php
+return response()->noContent();         // 204 No Content
+return response()->status(500);         // Custom status code
+return response()->header('X-Custom', 'value');
+return response()->cookie('key', 'value', 60);
+```

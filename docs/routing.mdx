@@ -1,0 +1,125 @@
+# Routing
+
+Noor provides a clean, fluent routing API inspired by Laravel.
+
+## Basic Routes
+
+```php
+Route::get('/users', $handler);
+Route::post('/users', $handler);
+Route::put('/users/{id}', $handler);
+Route::patch('/users/{id}', $handler);
+Route::delete('/users/{id}', $handler);
+Route::options('/users', $handler);
+```
+
+### Multiple Methods
+
+```php
+Route::match(['get', 'post'], '/form', $handler);
+Route::any('/catch-all', $handler);
+```
+
+## Route Parameters
+
+Required parameters are wrapped in curly braces:
+
+```php
+Route::get('/user/{id}', function ($request) {
+    return "User ID: " . $request->id;
+});
+
+Route::get('/post/{slug}', function ($request) {
+    return "Post: " . $request->slug;
+});
+```
+
+### Optional Parameters
+
+```php
+Route::get('/user/{id}/{slug?}', function ($request) {
+    return $request->slug ?? 'No slug provided';
+});
+```
+
+### Where Constraints
+
+```php
+Route::get('/user/{id}', $handler)->where('id', '[0-9]+');
+Route::get('/post/{slug}', $handler)->where('slug', '[a-z-]+');
+```
+
+## Named Routes
+
+```php
+Route::get('/profile', $handler)->name('profile');
+Route::get('/user/{id}', $handler)->name('user.show');
+
+// Generate URLs
+$url = Route::url('profile');
+$url = Route::url('user.show', ['id' => 5]);
+```
+
+## Route Groups
+
+### Prefix Groups
+
+```php
+Route::group(['prefix' => '/api'], function () {
+    Route::get('/users', $handler);   // /api/users
+    Route::get('/posts', $handler);   // /api/posts
+});
+```
+
+### Middleware Groups
+
+```php
+Route::group(['middleware' => ['auth']], function () {
+    Route::get('/dashboard', $handler);
+    Route::get('/settings', $handler);
+});
+```
+
+### Combined
+
+```php
+Route::group(['prefix' => '/admin', 'middleware' => ['auth']], function () {
+    Route::get('/', $handler);           // /admin
+    Route::get('/users', $handler);      // /admin/users
+});
+```
+
+### Nested Groups
+
+```php
+Route::group(['prefix' => '/api'], function () {
+    Route::group(['middleware' => ['auth']], function () {
+        Route::get('/profile', $handler);   // /api/profile (with auth)
+    });
+});
+```
+
+## Route Handlers
+
+### Closure
+
+```php
+Route::get('/', function ($request) {
+    return response()->json(['hello' => 'world']);
+});
+```
+
+### Controller Classes
+
+```php
+// controllers/UserController.php
+class UserController {
+    public function index($request) {
+        return DB::table('users')->get();
+    }
+}
+
+Route::get('/users', 'UserController@index');
+// or
+Route::get('/users', [UserController::class, 'index']);
+```

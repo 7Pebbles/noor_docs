@@ -1,0 +1,132 @@
+# Getting Started
+
+**Noor** is a single-file PHP framework optimized for shared hosting environments. Drop `noor.php` into your project and start building — no Composer, no CLI, no configuration required.
+
+## Requirements
+
+- PHP 7.4+
+- Apache with `mod_rewrite` (for `.htaccess` routing) or any web server
+- PDO extensions: `pdo_mysql`, `pdo_sqlite`, or `pdo_pgsql` (optional for database)
+
+## Quickstart
+
+### 1. Create your project
+
+```
+your-project/
+├── index.php      # Your routes & bootstrap
+├── noor.php       # The framework (one file)
+├── .htaccess      # Apache rewrite rules
+├── views/         # Template files
+│   └── home.php
+└── config.php     # Optional config
+```
+
+### 2. Create `index.php`
+
+```php
+<?php
+
+require_once __DIR__ . '/noor.php';
+
+Route::get('/', function () {
+    return response()->view('home', ['title' => 'Hello World']);
+});
+
+App::run();
+```
+
+### 3. Create a view `views/home.php`
+
+```php
+@extends('layouts.main')
+
+@section('title', 'Home')
+
+@section('content')
+    <h1>{{ $title }}</h1>
+@endsection
+```
+
+### 4. Create a layout `views/layouts/main.php`
+
+```php
+<!DOCTYPE html>
+<html>
+<head>
+    <title>@yield('title')</title>
+</head>
+<body>
+    @yield('content')
+</body>
+</html>
+```
+
+### 5. Add `.htaccess`
+
+```apache
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^ index.php [L]
+```
+
+### 6. Visit your site
+
+Open your browser and navigate to your project URL. That's it.
+
+## Directory Structure
+
+```
+your-project/
+├── index.php           # Entry point, define routes here
+├── noor.php            # The framework (single file)
+├── .htaccess           # Apache rewrite rules
+├── config.php          # Optional configuration
+├── .env                # Optional environment variables
+├── views/              # Template files
+│   ├── layouts/
+│   │   └── main.php
+│   └── home.php
+├── controllers/        # Optional controller classes
+├── models/             # Optional model classes
+├── migrations/         # SQL migration files (*.sql)
+└── uploads/            # File upload destination
+```
+
+## Configuration
+
+### Environment (`.env`)
+
+```env
+APP_NAME=Noor
+APP_ENV=local
+APP_DEBUG=true
+APP_URL=http://localhost
+
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=noor
+DB_USERNAME=root
+DB_PASSWORD=
+```
+
+Access via `env('APP_NAME', 'default')`.
+
+### Config File (`config.php`)
+
+Return a nested array:
+
+```php
+<?php
+
+return [
+    'app' => [
+        'name'  => env('APP_NAME', 'Noor'),
+        'debug' => env('APP_DEBUG', false),
+    ],
+];
+```
+
+Access via `config('app.debug')`.

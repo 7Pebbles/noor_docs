@@ -1,0 +1,134 @@
+# Validation
+
+The `Validator` class provides a simple, extensible way to validate input data.
+
+## Basic Usage
+
+```php
+$validator = Validator::make($request->all(), [
+    'name'     => 'required|string|max:255',
+    'email'    => 'required|email|max:255',
+    'password' => 'required|min:8|confirmed',
+]);
+
+if ($validator->fails()) {
+    return redirect('/register')
+        ->withErrors($validator->errors())
+        ->withInput();
+}
+
+// Validation passed
+```
+
+## Available Rules
+
+| Rule | Description |
+|------|-------------|
+| `required` | Field must be present and non-empty |
+| `email` | Must be a valid email address |
+| `min:N` | Minimum length (string) or value (numeric) or count (array) |
+| `max:N` | Maximum length, value, or count |
+| `numeric` | Must be a number |
+| `integer` | Must be an integer |
+| `string` | Must be a string |
+| `boolean` | Must be true/false/0/1 |
+| `alpha` | May only contain letters |
+| `alpha_num` | May only contain letters and numbers |
+| `url` | Must be a valid URL |
+| `ip` | Must be a valid IP address |
+| `date` | Must be a valid date (parsable by strtotime) |
+| `confirmed` | Must match `{field}_confirmation` |
+| `same:field` | Must match another field |
+| `different:field` | Must differ from another field |
+| `in:a,b,c` | Must be one of the given values |
+| `not_in:a,b,c` | Must not be one of the given values |
+| `array` | Must be an array |
+| `nullable` | Field is optional (skips other rules when null) |
+| `regex:/pattern/` | Must match the regex pattern |
+
+## Rule Arrays
+
+Rules can also be specified as arrays:
+
+```php
+$validator = Validator::make($request->all(), [
+    'name'     => ['required', 'string', 'max:255'],
+    'email'    => ['required', 'email'],
+    'password' => ['required', 'min:8'],
+]);
+```
+
+## Custom Error Messages
+
+```php
+$validator = Validator::make($request->all(), [
+    'email' => 'required|email',
+], [
+    'email.required' => 'We need your email address.',
+    'email.email'    => 'That does not look like a valid email.',
+]);
+```
+
+## Custom Rules
+
+```php
+Validator::extend('strong_password', function ($field, $value, $params, $data) {
+    return (bool) preg_match('/[A-Z]/', $value) && strlen($value) >= 8;
+}, 'The :attribute is not strong enough.');
+
+// Usage
+$validator = Validator::make($request->all(), [
+    'password' => 'required|strong_password',
+]);
+```
+
+## Validation Errors
+
+```php
+$errors = $validator->errors();
+// ['email' => ['The email field is required.'], 'name' => ['...']]
+
+$first = $validator->firstError();
+$first = $validator->firstError('email');
+
+$all   = $validator->all();
+// ['The email field is required.', 'The name field is required.']
+```
+
+## In Practice
+
+A common pattern with redirects:
+
+```php
+Route::post('/register', function ($request) {
+    $validator = Validator::make($request->all(), [
+        'name'     => 'required|string|max:255',
+        'email'    => 'required|email|max:255',
+        'password' => 'required|min:8|confirmed',
+    ]);
+
+    if ($validator->fails()) {
+        return redirect('/register')
+            ->withErrors($validator->errors())
+            ->withInput();
+    }
+
+    $user = Auth::register($request->only(['name', 'email', 'password']));
+    Auth::login($user);
+    return redirect('/dashboard')->with('success', 'Account created!');
+});
+```
+
+In views, errors are automatically displayed when flashed:
+
+```php
+@if (session('_errors'))
+    <ul>
+        @foreach (session('_errors') as $field => $errors)
+            @foreach ($errors as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        @endforeach
+    </ul>
+@endif
+```

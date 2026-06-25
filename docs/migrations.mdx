@@ -1,0 +1,58 @@
+# Migrations
+
+Run plain SQL migration files in order to manage database schema changes.
+
+## Setup
+
+Create a `migrations/` directory in your project root with numbered SQL files:
+
+```
+migrations/
+├── 001_create_users_table.sql
+├── 002_add_posts_table.sql
+├── 003_add_role_to_users.sql
+```
+
+## Migration Files
+
+```sql
+-- migrations/001_create_users_table.sql
+CREATE TABLE users (
+    id INTEGER PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+```
+
+```sql
+-- migrations/002_add_posts_table.sql
+CREATE TABLE posts (
+    id INTEGER PRIMARY KEY AUTO_INCREMENT,
+    user_id INTEGER NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    body TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+```
+
+## Running Migrations
+
+```php
+DB::migrate();
+// or specify a directory
+DB::migrate(__DIR__ . '/migrations');
+// or a specific connection
+DB::migrate(__DIR__ . '/migrations', 'pgsql');
+```
+
+The migrator:
+1. Creates a `__migrations` tracking table if it doesn't exist
+2. Compares files against already-run migrations
+3. Runs new migrations in alphabetical order
+4. Records each migration with a batch number
+
+Only un-run migration files are executed. Files are tracked by filename, so renaming a migration file will cause it to run again.

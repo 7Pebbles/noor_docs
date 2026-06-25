@@ -1,0 +1,120 @@
+# Configuration
+
+## Environment Variables
+
+Create a `.env` file in your project root:
+
+```env
+APP_NAME=Noor
+APP_ENV=local
+APP_DEBUG=true
+APP_URL=http://localhost
+
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=noor
+DB_USERNAME=root
+DB_PASSWORD=
+```
+
+Access values with the `env()` helper:
+
+```php
+$name  = env('APP_NAME', 'Noor');
+$debug = env('APP_DEBUG', false);
+$db    = env('DB_CONNECTION', 'mysql');
+```
+
+The `.env` file is optional. Noor works without it.
+
+### Type Casting
+
+The `env()` helper auto-casts common string values:
+- `'true'` / `'false'` → boolean `true` / `false`
+- `'null'` → `null`
+- Everything else → string
+
+## Config File
+
+Create `config.php` that returns a nested array:
+
+```php
+<?php
+
+return [
+    'app' => [
+        'name'     => env('APP_NAME', 'Noor'),
+        'env'      => env('APP_ENV', 'production'),
+        'debug'    => env('APP_DEBUG', false),
+        'url'      => env('APP_URL', 'http://localhost'),
+        'timezone' => 'UTC',
+    ],
+
+    'database' => [
+        'default' => env('DB_CONNECTION', 'mysql'),
+        'connections' => [
+            'mysql' => [
+                'driver'   => 'mysql',
+                'host'     => env('DB_HOST', '127.0.0.1'),
+                'port'     => env('DB_PORT', '3306'),
+                'database' => env('DB_DATABASE', 'noor'),
+                'username' => env('DB_USERNAME', 'root'),
+                'password' => env('DB_PASSWORD', ''),
+                'charset'  => 'utf8mb4',
+            ],
+            'sqlite' => [
+                'driver'   => 'sqlite',
+                'database' => env('DB_DATABASE', __DIR__ . '/database.sqlite'),
+            ],
+            'pgsql' => [
+                'driver'   => 'pgsql',
+                'host'     => env('DB_HOST', '127.0.0.1'),
+                'port'     => env('DB_PORT', '5432'),
+                'database' => env('DB_DATABASE', 'noor'),
+                'username' => env('DB_USERNAME', 'postgres'),
+                'password' => env('DB_PASSWORD', ''),
+            ],
+        ],
+    ],
+
+    'auth' => [
+        'table'    => 'users',
+        'username' => 'email',
+        'id'       => 'id',
+    ],
+];
+```
+
+Access with the `config()` helper using dot notation:
+
+```php
+$debug    = config('app.debug');
+$timezone = config('app.timezone', 'UTC');
+$host     = config('database.connections.mysql.host');
+
+// Set at runtime
+App::setConfig('app.debug', true);
+```
+
+The config file is optional. Noor works without it.
+
+## Helper Function Reference
+
+```php
+app()                    // App singleton instance
+request()                // Current Request
+response()               // New Response instance
+view('name', $data)      // Render a view
+redirect('/path')        // Redirect response
+abort(404)               // Throw HTTP exception
+url('/path')             // Generate absolute URL
+env('KEY', 'default')    // Environment variable
+config('app.key')        // Config value (dot notation)
+csrf_token()             // Current CSRF token
+csrf_field()             // Hidden CSRF input HTML
+method_field('PUT')      // Hidden method spoof input
+old('key')               // Old flashed input
+session('key')           // Session value
+dd($var)                 // Dump and die
+```

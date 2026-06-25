@@ -1,0 +1,134 @@
+# Templating
+
+Noor includes a lightweight template engine using plain `.php` files with Blade-style directives.
+
+Views live in the `views/` directory. Use dot notation for subdirectories:
+
+- `home` → `views/home.php`
+- `admin.dashboard` → `views/admin/dashboard.php`
+- `layouts.main` → `views/layouts/main.php`
+
+## Echo
+
+```php
+{{ $variable }}           // Escaped (htmlspecialchars)
+{!! $variable !!}         // Raw (unescaped)
+{{ $user->name ?? 'Guest' }}
+```
+
+## Control Structures
+
+### If / Else
+
+```php
+@if ($user->role === 'admin')
+    <p>Welcome, admin!</p>
+@elseif ($user->role === 'editor')
+    <p>Welcome, editor!</p>
+@else
+    <p>Welcome, user!</p>
+@endif
+```
+
+### Unless
+
+```php
+@unless ($user->isBanned())
+    <p>You can post comments.</p>
+@endunless
+```
+
+### Loops
+
+```php
+@foreach ($users as $user)
+    <p>{{ $user->name }}</p>
+@endforeach
+
+@for ($i = 0; $i < 10; $i++)
+    <p>Iteration {{ $i }}</p>
+@endfor
+
+@while ($item = array_pop($items))
+    <p>{{ $item }}</p>
+@endwhile
+```
+
+### Other Conditionals
+
+```php
+@isset ($users)
+    {{ count($users) }} users found
+@endisset
+
+@empty ($users)
+    No users found
+@endempty
+```
+
+## Includes
+
+```php
+@include('header')
+@include('components.card', ['title' => 'Hello'])
+```
+
+## Layouts
+
+Define sections in a child view and yield them in the parent layout.
+
+### Layout (`views/layouts/main.php`)
+
+```php
+<!DOCTYPE html>
+<html>
+<head>
+    <title>@yield('title', 'Default Title')</title>
+</head>
+<body>
+    <header>@include('partials.nav')</header>
+
+    <main>
+        @yield('content')
+    </main>
+
+    <footer>&copy; {{ date('Y') }} My App</footer>
+</body>
+</html>
+```
+
+### Child View (`views/home.php`)
+
+```php
+@extends('layouts.main')
+
+@section('title', 'Home Page')
+
+@section('content')
+    <h1>Welcome to my app</h1>
+    <p>This content goes inside the layout's main tag.</p>
+@endsection
+```
+
+## Shared Data
+
+```php
+View::share('siteName', 'My App');
+// Now {{ $siteName }} works in all views
+```
+
+## Helpers
+
+```php
+@csrf              // Generates <input type="hidden" name="_token" value="...">
+@method('PUT')     // Generates <input type="hidden" name="_method" value="PUT">
+
+@php
+    // Inline PHP
+    $count = count($users);
+@endphp
+
+@verbatim
+    {{ This text is not parsed }}
+@endverbatim
+```

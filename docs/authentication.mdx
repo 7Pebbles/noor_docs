@@ -1,0 +1,90 @@
+# Authentication
+
+Noor provides a simple auth system using bcrypt password hashing and session-based logins.
+
+## Configuration
+
+The auth system reads from `config.php`:
+
+```php
+'auth' => [
+    'table'    => 'users',
+    'username' => 'email',
+    'id'       => 'id',
+],
+```
+
+Your `users` table must have at minimum:
+- An `id` column (integer primary key)
+- An `email` column (or whatever `username` is set to)
+- A `password` column (stores bcrypt hashes)
+
+## Usage
+
+### Attempt Login
+
+```php
+if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
+    // Success — user is now logged in
+    return redirect('/dashboard');
+}
+return redirect('/login')->withErrors(['email' => ['Invalid credentials.']]);
+```
+
+### Check Auth State
+
+```php
+if (Auth::check()) { ... }       // Logged in
+if (Auth::guest()) { ... }       // Not logged in
+$user = Auth::user();            // The authenticated user object
+$id   = Auth::id();              // The authenticated user's ID
+```
+
+### Direct Login / Logout
+
+```php
+// Login without password verification
+$user = DB::table('users')->find(1);
+Auth::login($user);
+
+// Logout
+Auth::logout();
+```
+
+### Register
+
+```php
+$user = Auth::register([
+    'name'     => $request->name,
+    'email'    => $request->email,
+    'password' => $request->password,  // Automatically hashed
+]);
+
+Auth::login($user);
+```
+
+### Validate (without login)
+
+```php
+if (Auth::validate(['email' => $email, 'password' => $password])) {
+    // Credentials are valid
+}
+```
+
+## Auth Middleware
+
+Protect routes with middleware:
+
+```php
+Route::get('/dashboard', $handler)->middleware('auth');
+Route::get('/login', $handler)->middleware('guest');
+Route::get('/settings', $handler)->middleware('auth');
+
+// Group middleware
+Route::group(['middleware' => ['auth']], function () {
+    Route::get('/dashboard', $handler);
+    Route::get('/profile', $handler);
+});
+```
+
+Customize redirect URLs by modifying the middleware behavior in your route handlers.
